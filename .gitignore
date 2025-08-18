@@ -6,6 +6,7 @@ cmake_install.cmake
 Makefile
 *.sln
 *.vcxproj*
+.cache/
 
 # External libraries (user-provided)
 /external/
