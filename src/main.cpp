@@ -15,6 +15,7 @@ int main()
 	const auto window_height = 720;
 
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetTargetFPS(60);
 
 	InitWindow(window_width, window_height, "Hello Raylib!");
 	if (!IsWindowReady()) {
