@@ -47,8 +47,8 @@ int main()
 	const float spacing = 1.0f;
 
 	// center the instances
-	const float offsetX = (xInstances * spacing) / 2;
-	const float offsetZ = (yInstances * spacing) / 2;
+	const float offsetX = (xInstances - 1) * spacing / 2;
+	const float offsetZ = (yInstances - 1) * spacing / 2;
 
 	for (int x = 0; x < xInstances; x++) {
 		for (int y = 0; y < yInstances; y++) {
