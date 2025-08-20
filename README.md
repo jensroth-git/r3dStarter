@@ -34,5 +34,5 @@ cmake -S . -B build -G "MinGW Makefiles" \
 - `CMakeLists.txt`: Fetches and configures `raylib`, `assimp`, and `r3d`.
 
 ## Use as a template
-- Copy this folder to start a new project, or publish it to your VCS and use the platform's "Use this template" feature.
+- Copy this folder to start a new project, or use Github's "Use this template" feature.
 
