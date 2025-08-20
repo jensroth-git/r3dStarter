@@ -32,6 +32,7 @@ set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
 set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
 
 # Fetch raylib
+message(STATUS "Downloading and configuring raylib...")
 FetchContent_Declare(
     raylib
     GIT_REPOSITORY https://github.com/raysan5/raylib.git
@@ -41,6 +42,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(raylib)
 
 # Fetch assimp
+message(STATUS "Downloading and configuring assimp...")
 FetchContent_Declare(
     assimp
     GIT_REPOSITORY https://github.com/assimp/assimp.git
@@ -61,6 +63,7 @@ if(NOT DEFINED PYTHON_EXECUTABLE)
 endif()
 
 # Fetch r3d
+message(STATUS "Downloading and configuring r3d...")
 FetchContent_Declare(
     r3d
     GIT_REPOSITORY https://github.com/Bigfoot71/r3d.git
