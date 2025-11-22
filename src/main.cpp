@@ -1,7 +1,6 @@
-#include <r3d.h>
 #include <raylib.h>
 #include <raymath.h>
-
+#include <r3d.h>
 #include <vector>
 
 static R3D_Mesh meshSphere = {0};
@@ -18,13 +17,13 @@ int main()
     SetTargetFPS(60);
 
 	InitWindow(window_width, window_height, "Hello Raylib!");
+
 	if (!IsWindowReady()) {
 		TraceLog(LOG_ERROR, "Window failed to initialize");
 		return 1;
 	}
 
-	// Initialize r3d after the window is created (disabled while isolating issue)
-	R3D_Init(GetScreenWidth(), GetScreenHeight(), 0);
+	R3D_Init(window_width, window_height, 0);
 
 	camDefault = (Camera3D) {
 		.position = (Vector3) {0, 2, 2},
@@ -63,6 +62,7 @@ int main()
     }
 
 	while (!WindowShouldClose()) {
+		
 		UpdateCamera(&camDefault, CAMERA_ORBITAL);
 
 		BeginDrawing();
@@ -79,7 +79,7 @@ int main()
 		DrawText(text, window_width / 2 - text_width / 2, window_height / 2 - text_height / 2, text_height, RED);
 		EndDrawing();
 	}
-
+	
 	R3D_UnloadMesh(&meshSphere);
 
 	R3D_Close();

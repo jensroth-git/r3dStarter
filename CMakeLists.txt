@@ -32,6 +32,7 @@ set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
 set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
 
 # Fetch raylib
+message(STATUS "Downloading and configuring raylib...")
 FetchContent_Declare(
     raylib
     GIT_REPOSITORY https://github.com/raysan5/raylib.git
@@ -41,6 +42,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(raylib)
 
 # Fetch assimp
+message(STATUS "Downloading and configuring assimp...")
 FetchContent_Declare(
     assimp
     GIT_REPOSITORY https://github.com/assimp/assimp.git
@@ -61,6 +63,7 @@ if(NOT DEFINED PYTHON_EXECUTABLE)
 endif()
 
 # Fetch r3d
+message(STATUS "Downloading and configuring r3d...")
 FetchContent_Declare(
     r3d
     GIT_REPOSITORY https://github.com/Bigfoot71/r3d.git
@@ -80,7 +83,27 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE r3d)
+# r3d doesn't currently expose its public headers via target properties,
+# so add its include directory explicitly for the application target.
+if(NOT r3d_SOURCE_DIR)
+    FetchContent_GetProperties(r3d)
+endif()
+
+if(NOT raylib_SOURCE_DIR)
+    FetchContent_GetProperties(raylib)
+endif()
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        ${r3d_SOURCE_DIR}/include
+        ${raylib_SOURCE_DIR}/include
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        r3d
+        raylib
+)
 
 # On Windows, also link required system libs
 if (WIN32)
