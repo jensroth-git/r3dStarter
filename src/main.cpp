@@ -1,11 +1,11 @@
 #include <raylib.h>
 #include <raymath.h>
-#include <r3d.h>
-#include <vector>
+#include <r3d/r3d.h>
 
-static R3D_Mesh meshSphere = {0};
-static R3D_Material matDefault = {0};
-static Camera3D camDefault = {0};
+static R3D_Mesh meshSphere = {};
+static R3D_Material matDefault = {};
+static R3D_InstanceBuffer instanceBuffer = {};
+static Camera3D camDefault = {};
 
 int main()
 {
@@ -38,28 +38,32 @@ int main()
         R3D_SetLightActive(light, true);
     }
 
-	std::vector<Matrix> instances;
-
 	const int xInstances = 7;
 	const int yInstances = 7;
 
-	const float spacing = 1.0f;
+	instanceBuffer = R3D_LoadInstanceBuffer(xInstances*xInstances, R3D_INSTANCE_POSITION);
+	auto* positions = static_cast<Vector3*>(R3D_MapInstances(instanceBuffer, R3D_INSTANCE_POSITION));
 
 	// center the instances
+	const float spacing = 1.0f;
 	const float offsetX = (xInstances - 1) * spacing / 2;
 	const float offsetZ = (yInstances - 1) * spacing / 2;
 
 	for (int x = 0; x < xInstances; x++) {
 		for (int y = 0; y < yInstances; y++) {
-			instances.push_back(MatrixTranslate(x * spacing - offsetX, 0, y * spacing - offsetZ));
+			positions[y * xInstances + x] = { x * spacing - offsetX, 0, y * spacing - offsetZ };
 		}
 	}
+	R3D_UnmapInstances(instanceBuffer, R3D_INSTANCE_POSITION);
 
-    meshSphere = R3D_GenMeshSphere(0.25f, 64, 64, true);
+    meshSphere = R3D_GenMeshSphere(0.25f, 64, 64);
 	matDefault = R3D_GetDefaultMaterial();
     {
         matDefault.albedo.color = (Color){255, 255, 255, 255};
     }
+
+	R3D_ENVIRONMENT_SET(background.color, (Color){0, 0, 255, 255});
+	R3D_ENVIRONMENT_SET(ambient.color, DARKGRAY);
 
 	while (!WindowShouldClose()) {
 		
@@ -68,8 +72,7 @@ int main()
 		BeginDrawing();
 
 		R3D_Begin(camDefault);
-		R3D_SetBackgroundColor(Color {0, 0, 255, 255});
-		R3D_DrawMeshInstanced(&meshSphere, &matDefault, instances.data(), instances.size());
+		R3D_DrawMeshInstanced(meshSphere, matDefault, instanceBuffer, xInstances*yInstances);
 		R3D_End();
 
 		const auto text = "Hello, Raylib and R3D!";
@@ -80,7 +83,8 @@ int main()
 		EndDrawing();
 	}
 	
-	R3D_UnloadMesh(&meshSphere);
+	R3D_UnloadInstanceBuffer(instanceBuffer);
+	R3D_UnloadMesh(meshSphere);
 
 	R3D_Close();
 	CloseWindow();
