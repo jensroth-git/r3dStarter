@@ -12,7 +12,7 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 include(FetchContent)
 
 # Allow users to override git tags to pin versions when desired
-set(RAYLIB_GIT_TAG master CACHE STRING "Git tag/branch for raylib")
+set(RAYLIB_GIT_TAG 5.5 CACHE STRING "Git tag/branch for raylib")
 set(ASSIMP_GIT_TAG master CACHE STRING "Git tag/branch for assimp")
 set(R3D_GIT_TAG master CACHE STRING "Git tag/branch for r3d")
 
@@ -29,7 +29,7 @@ set(SUPPORT_MESH_GENERATION OFF CACHE BOOL "" FORCE)
 # assimp knobs (leaner build; keep install/tests off)
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
-set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL ON CACHE BOOL "" FORCE)
 
 # Fetch raylib
 message(STATUS "Downloading and configuring raylib...")
@@ -38,7 +38,9 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/raysan5/raylib.git
     GIT_TAG ${RAYLIB_GIT_TAG}
     GIT_SHALLOW TRUE
+    OVERRIDE_FIND_PACKAGE ON
 )
+
 FetchContent_MakeAvailable(raylib)
 
 # Fetch assimp
@@ -48,6 +50,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/assimp/assimp.git
     GIT_TAG ${ASSIMP_GIT_TAG}
     GIT_SHALLOW TRUE
+    OVERRIDE_FIND_PACKAGE ON
 )
 FetchContent_MakeAvailable(assimp)
 
@@ -55,6 +58,13 @@ FetchContent_MakeAvailable(assimp)
 set(R3D_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(R3D_RAYLIB_VENDORED OFF CACHE BOOL "" FORCE)
 set(R3D_ASSIMP_VENDORED OFF CACHE BOOL "" FORCE)
+
+# Setup variables that r3d expects from find_package()
+set(RAYLIB_INCLUDE_DIRS "${raylib_SOURCE_DIR}/src" CACHE PATH "" FORCE)
+set(RAYLIB_LIBRARIES "raylib" CACHE STRING "" FORCE)
+
+set(ASSIMP_INCLUDE_DIRS "${assimp_SOURCE_DIR}/include;${assimp_BINARY_DIR}/include" CACHE PATH "" FORCE)
+set(ASSIMP_LIBRARIES "assimp" CACHE STRING "" FORCE)
 
 # r3d requires Python for shader/asset embedding
 if(NOT DEFINED PYTHON_EXECUTABLE)
@@ -86,17 +96,20 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 # r3d doesn't currently expose its public headers via target properties,
 # so add its include directory explicitly for the application target.
 if(NOT r3d_SOURCE_DIR)
+    message(STATUS "r3d_SOURCE_DIR not set; cannot add include directory for r3d. This may cause build errors.")
     FetchContent_GetProperties(r3d)
 endif()
 
 if(NOT raylib_SOURCE_DIR)
+    message(STATUS "raylib_SOURCE_DIR not set; cannot add include directory for raylib. This may cause build errors.")
     FetchContent_GetProperties(raylib)
 endif()
 
+
 target_include_directories(${PROJECT_NAME}
     PRIVATE
-        ${r3d_SOURCE_DIR}/include
-        ${raylib_SOURCE_DIR}/include
+        ${r3d_SOURCE_DIR}/include/r3d
+        ${raylib_SOURCE_DIR}/src
 )
 
 target_link_libraries(${PROJECT_NAME}

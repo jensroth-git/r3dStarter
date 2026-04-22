@@ -70,4 +70,3 @@ AlignAfterOpenBracket: BlockIndent   # ← replace AlwaysBreak
 BinPackArguments: false
 BracedInitializerIndentWidth: 4
 SpaceBeforeCpp11BracedList: true
-...
